@@ -43,6 +43,21 @@ write(Ref, Val) ->
 
 %% Internals
 
+% On some Pis, the GPIO interface can take a moment to set up. This
+% tries for a while to open the direction file before giving up.
+waitForDirectionFile(DirectionFile) ->
+    WaitForFile = fun F(Count) when Count > 0 ->
+                          { Result, Ref } = file:open(DirectionFile, [write]),
+                          case { Result, Ref} of
+                              { ok, _ } -> Ref;
+                              { error, eacces } ->
+                                  receive after 250 -> ok end,
+                                  F(Count - 1)
+                          end;
+                      F(0) -> throw({error, eacces})
+                  end,
+    WaitForFile(10).
+
 configure(Pin, Direction) ->
   DirectionFile = "/sys/class/gpio/gpio" ++ integer_to_list(Pin) ++ "/direction",
 
@@ -52,12 +67,8 @@ configure(Pin, Direction) ->
   file:close(RefExport),
 
   % It can take a moment for the GPIO pin file to be created.
-  case filelib:is_file(DirectionFile) of
-      true -> ok;
-      false -> receive after 1000 -> ok end
-  end,
+  RefDirection = waitForDirectionFile(DirectionFile),
 
-  {ok, RefDirection} = file:open(DirectionFile, [write]),
   case Direction of
     in -> file:write(RefDirection, "in");
     out -> file:write(RefDirection, "out")
