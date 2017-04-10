@@ -1,4 +1,4 @@
-#πGPIO
+# πGPIO
 A simple, pure erlang implementation of a module for Raspberry Pi's General Purpose 
 Input/Output (GPIO), using the standard Linux kernel interface for user-space, sysfs,
 available at /sys/class/gpio/.
