@@ -51,7 +51,7 @@ waitForDirectionFile(DirectionFile) ->
                           case { Result, Ref} of
                               { ok, _ } -> Ref;
                               { error, eacces } ->
-                                  receive after 250 -> ok end,
+                                  timer:sleep(250),
                                   F(Count - 1)
                           end;
                       F(0) -> throw({error, eacces})
