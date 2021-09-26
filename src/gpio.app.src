@@ -2,6 +2,7 @@
  [
   {description, "A simple raspbery pi user-space gpio library"},
   {vsn, "1"},
+  {mod, {gpio_app, []}},
   {modules, [
              gpio
             ]},
@@ -10,5 +11,7 @@
                   kernel,
                   stdlib
                  ]},
-  {env, []}
+  %% default gpio path points to the interface exposed by Linux kernel,
+  %% however it can be overriden (e.g. for unit, functional or integration tests)
+  {env, [{gpio_path, "/sys/class/gpio"}]}
  ]}.
