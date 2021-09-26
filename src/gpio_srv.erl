@@ -59,7 +59,7 @@ start(Pin, Direction, ActiveLow) ->
     end.
 
 stop(Pin) ->
-    supervisor:terminate_child(gpio_sup, ?CHILD_ID(Pin)).
+    supervisor:terminate_child(gpio_sup, whereis(?CHILD_ID(Pin))).
 
 read(Pin) ->
     gen_server:call(?CHILD_ID(Pin), read_value).
